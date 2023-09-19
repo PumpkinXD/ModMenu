@@ -1,7 +1,7 @@
 package io.github.prospector.modmenu.event;
 
+import com.terraformersmc.modmenu.api.ModMenuApi;
 import io.github.prospector.modmenu.ModMenu;
-import io.github.prospector.modmenu.api.ModMenuApi;
 import io.github.prospector.modmenu.config.ModMenuConfig;
 import io.github.prospector.modmenu.gui.ModsScreen;
 import io.github.prospector.modmenu.gui.widget.ModMenuButtonWidget;
@@ -65,7 +65,7 @@ public class ModMenuEventHandler {
 				} else if ( ModMenuConfig.MODS_BUTTON_STYLE.getValue() == ModMenuConfig.ModsButtonStyle.SHRINK ) {
 					buttons.add( modsButtonIndex, new ModMenuButtonWidget( 995, screen.width / 2 + 2, buttonsY, 98, 20, ModMenuApi.createModsButtonText(), screen ) );
 				} else if ( ModMenuConfig.MODS_BUTTON_STYLE.getValue() == ModMenuConfig.ModsButtonStyle.ICON ) {
-					buttons.add( modsButtonIndex, new ModMenuTexturedButtonWidget( 996, screen.width / 2 + 104, buttonsY, 20, 20, 0, 0, FABRIC_ICON_BUTTON_LOCATION, 32, 64, button -> MinecraftClient.getInstance().openScreen( new ModsScreen( screen ) ) ) {
+					buttons.add( modsButtonIndex, new ModMenuTexturedButtonWidget( 996, screen.width / 2 + 104, buttonsY, 20, 20, 0, 0, FABRIC_ICON_BUTTON_LOCATION, 32, 64, button -> MinecraftClient.getInstance().setScreen( new ModsScreen( screen ) ) ) {
 					} );
 				}
 			}
@@ -128,7 +128,7 @@ public class ModMenuEventHandler {
 							FABRIC_ICON_BUTTON_LOCATION,
 							32,
 							64,
-							button -> MinecraftClient.getInstance().openScreen( new ModsScreen( screen ) ) ) {
+							button -> MinecraftClient.getInstance().setScreen( new ModsScreen( screen ) ) ) {
 						}
 					);
 			}

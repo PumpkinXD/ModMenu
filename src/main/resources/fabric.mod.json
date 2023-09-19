@@ -15,11 +15,13 @@
     ]
   },
   "contact": {
-    "homepage": "https://minecraft.curseforge.com/projects/modmenu",
-    "issues": "https://github.com/Prospector/ModMenu/issues"
+    "homepage": "https://modrinth.com/mod/modmenu",
+    "sources": "https://github.com/TerraformersMC/ModMenu",
+    "issues": "https://github.com/TerraformersMC/ModMenu/issues"
   },
   "authors": [
     "Prospector",
+    "TerraformersMC",
     "ENDERZOMBI102"
   ],
   "contributors": [
@@ -46,7 +48,5 @@
   "description": "Adds a mod menu to view the list of mods you have installed.",
   "mixins": [
     "mixins.modmenu.json"
-  ],
-  "depends": {
-  }
+  ]
 }

@@ -191,6 +191,7 @@ public class FabricMod implements Mod {
 		return metadata.getVersion().getFriendlyString();
 	}
 
+	@Override
 	public @NotNull String getPrefixedVersion() {
 		String version = getVersion().trim();
 		if ( version.startsWith( "version" ) ) {

@@ -1,7 +1,7 @@
 package io.github.prospector.modmenu.config.option;
 
 import io.github.prospector.modmenu.gui.widget.AbstractButtonWidget;
-import net.minecraft.client.options.GameOptions;
+import net.minecraft.client.option.GameOptions;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;

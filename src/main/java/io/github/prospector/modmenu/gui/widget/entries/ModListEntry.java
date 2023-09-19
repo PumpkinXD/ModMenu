@@ -48,7 +48,7 @@ public class ModListEntry extends BetterEntryListWidget.Entry<ModListEntry> {
 		int iconSize = ModMenuConfig.COMPACT_LIST.getValue() ? COMPACT_ICON_SIZE : FULL_ICON_SIZE;
 		if ( "java".equals( mod.getId() ) )
 			DrawingUtil.drawRandomVersionBackground( mod, x, y, iconSize, iconSize );
-		GlStateManager.color4f( 1.0F, 1.0F, 1.0F, 1.0F );
+		GlStateManager.color( 1.0F, 1.0F, 1.0F, 1.0F );
 		this.bindIconTexture();
 		GlStateManager.enableBlend();
 		DrawableHelper.drawTexture( x, y, 0.0F, 0.0F, iconSize, iconSize, iconSize, iconSize );

@@ -7,7 +7,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.options.GameOptions;
+import net.minecraft.client.option.GameOptions;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -43,11 +43,13 @@ public class ButtonListWidget extends BetterEntryListWidget<ButtonListWidget.But
 			);
 	}
 
+	@Override
 	public int getRowWidth() {
 		return 400;
 	}
 
-	protected int getScrollbarPositionX() {
+	@Override
+	protected int getScrollbarPosition() {
 		return super.getScrollbarPosition() + 32;
 	}
 

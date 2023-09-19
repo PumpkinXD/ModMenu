@@ -24,7 +24,7 @@ public class DrawingUtil {
 		float r = (float) ( color >> 16 & 0xFF ) / 0xFF;
 		float g = (float) ( color >> 8 & 0xFF ) / 0xFF;
 		float b = (float) ( color & 0xFF ) / 0xFF;
-		GlStateManager.color4f( r, g, b, a );
+		GlStateManager.color( r, g, b, a );
 		DrawableHelper.fill( x, y, x + width, y + height, color );
 	}
 

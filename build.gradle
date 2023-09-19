@@ -1,57 +1,30 @@
 plugins {
+	id 'fabric-loom' version "1.3-SNAPSHOT" // To use chocoloom, change the version to a commit hash
+	id 'legacy-looming' version '1.3-SNAPSHOT'
 	id 'com.modrinth.minotaur' version "2.+"
-	id 'fabric-loom' version "1.0-SNAPSHOT" // To use chocoloom, change the version to a commit hash
 	id 'maven-publish'
 }
 
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
-
-archivesBaseName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
 
-repositories {
-	maven {
-		name = 'FabricMC'
-		url = 'https://maven.fabricmc.net'
-	}
-	maven {
-		name = "legacy-fabric"
-		url = "https://maven.legacyfabric.net"
-	}
-	maven { url 'https://jitpack.io' }
-	maven { url 'https://repsy.io/mvn/enderzombi102/mc' }
+base {
+	archivesName = project.archives_base_name
 }
-
-loom {
-	setIntermediaryUrl('https://maven.legacyfabric.net/net/legacyfabric/intermediary/%1$s/intermediary-%1$s-v2.jar');
-	// accessWidenerPath = file("src/main/resources/customskinloader.accesswidener");
-	
-	// Only needed for versions not available from vanilla launcher by default.
-	// customMinecraftManifest.set("https://meta.legacyfabric.net/v2/manifest/${minecraft_version}")
-
-	// Required by 1.7.x
-	runs {
-	         client {
-			programArgs "--userProperties", "{}"}
-	}
-}
-
-def lwjgl2 = !project.minecraft_version.startsWith("1.13")
-def currentOs = System.getProperty("os.name").toLowerCase(Locale.ENGLISH)
 
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings "net.legacyfabric:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	// Fabric API provides hooks for events, item registration, and more. As most mods will need this, it's included by default. 
-	// If you know for a fact you don't, it's not required and can be safely removed.
-	// modImplementation ("net.legacyfabric.legacy-fabric-api:legacy-fabric-api:${fabric_version}") {
- 	//	exclude module: "legacy-fabric-entity-events-v1"
- 	//}
-
+	modImplementation(include(legacy.apiModule("legacy-fabric-api-base", project.fabric_version)))
+	modImplementation(include(legacy.apiModule("legacy-fabric-api-base-common", project.fabric_version)))
+	modImplementation(include(legacy.apiModule("legacy-fabric-keybindings-api-v1-common", project.fabric_version)))
+	modImplementation(include(legacy.apiModule("legacy-fabric-lifecycle-events-v1", project.fabric_version)))
+	modImplementation(include(legacy.apiModule("legacy-fabric-lifecycle-events-v1-common", project.fabric_version)))
+	modImplementation(include(legacy.apiModule("legacy-fabric-logger-api-v1", project.fabric_version)))
+	modImplementation(include(legacy.apiModule("legacy-fabric-resource-loader-v1", project.fabric_version)))
+	modImplementation(include(legacy.apiModule("legacy-fabric-resource-loader-v1-common", project.fabric_version)))
 }
 
 processResources {
@@ -75,28 +48,28 @@ java {
 	// if it is present.
 	// If you remove this line, sources will not be generated.
 	withSourcesJar()
+
+	sourceCompatibility = JavaVersion.VERSION_1_8
+	targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 jar {
+	from("LICENSE") {
+		rename { "${it}_${project.base.archivesName.get()}" }
+	}
 }
 
 // configure the maven publication
 publishing {
 	publications {
 		mavenJava(MavenPublication) {
-			// add all the jars that should be included when publishing to maven
-			artifact(remapJar) {
-				builtBy remapJar
-			}
-			artifact(sourcesJar) {
-				builtBy remapSourcesJar
-			}
+			from components.java
 		}
 	}
 
 	// select the repositories you want to publish to
 	repositories {
-		if ( project.hasProperty('legacy_fabric_maven_publish_token') ) {
+		if (project.hasProperty('legacy_fabric_maven_publish_token')) {
 			maven {
 				url 'https://maven.legacyfabric.net/'
 				credentials {
@@ -115,14 +88,15 @@ publishing {
 		}
 	}
 }
+
 modrinth {
 	token = project.hasProperty('modrinth_token') ? project.getProperty("modrinth_token") : ""
 	projectId = 'XzTYkVLx'
-	versionNumber = version // You don't need to set this manually. Will fail if Modrinth has this version already
-	versionName = "Legacy Mod Menu $version"
+	versionNumber = project.version // You don't need to set this manually. Will fail if Modrinth has this version already
+	versionName = "Legacy Mod Menu $project.version"
 	versionType = 'release' // This is the default
 	uploadFile = remapJar // With Fabric Loom or Architectury Loom, this MUST be set to `remapJar` instead of `jar`!
-	gameVersions = [ minecraft_version ] // Must be an array, even with only one version
-	loaders = [ 'fabric' ] // Must also be an array - no need to specify this if you're using Fabric Loom or ForgeGradle
-	dependencies = [ ]
+	gameVersions = [project.minecraft_version] // Must be an array, even with only one version
+	loaders = ['fabric'] // Must also be an array - no need to specify this if you're using Fabric Loom or ForgeGradle
+	dependencies = []
 }

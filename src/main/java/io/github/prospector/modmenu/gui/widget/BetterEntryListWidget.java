@@ -65,6 +65,7 @@ public abstract class BetterEntryListWidget<E extends BetterEntryListWidget.Entr
 		this.children.addAll( newEntries );
 	}
 
+	@Override
 	public E getEntry( int index ) {
 		return this.children().get( index );
 	}
@@ -74,6 +75,7 @@ public abstract class BetterEntryListWidget<E extends BetterEntryListWidget.Entr
 		return this.children.size() - 1;
 	}
 
+	@Override
 	protected int getEntryCount() {
 		return this.children().size();
 	}
@@ -119,25 +121,30 @@ public abstract class BetterEntryListWidget<E extends BetterEntryListWidget.Entr
 		Entries() {
 		}
 
+		@Override
 		public E get( int i ) {
 			return this.entries.get( i );
 		}
 
+		@Override
 		public int size() {
 			return this.entries.size();
 		}
 
+		@Override
 		public E set( int i, E entry ) {
 			E entry2 = this.entries.set( i, entry );
 			BetterEntryListWidget.this.setEntryParentList( entry );
 			return entry2;
 		}
 
+		@Override
 		public void add( int i, E entry ) {
 			this.entries.add( i, entry );
 			BetterEntryListWidget.this.setEntryParentList( entry );
 		}
 
+		@Override
 		public E remove( int i ) {
 			return this.entries.remove( i );
 		}

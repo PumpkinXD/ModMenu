@@ -1,15 +1,15 @@
 package io.github.prospector.modmenu;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.LinkedListMultimap;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import io.github.prospector.modmenu.api.ConfigScreenFactory;
+import com.terraformersmc.modmenu.api.ConfigScreenFactory;
+import com.terraformersmc.modmenu.api.ModMenuApi;
 import io.github.prospector.modmenu.api.Mod;
-import io.github.prospector.modmenu.api.ModMenuApi;
 import io.github.prospector.modmenu.config.ModMenuConfig;
 import io.github.prospector.modmenu.config.ModMenuConfigManager;
+import io.github.prospector.modmenu.util.ModMenuApiMarker;
 import io.github.prospector.modmenu.util.mod.fabric.FabricDummyParentMod;
 import io.github.prospector.modmenu.util.mod.fabric.FabricMod;
 import net.fabricmc.api.ClientModInitializer;
@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
 import static io.github.prospector.modmenu.util.TranslationUtil.hasTranslation;
 
@@ -45,8 +44,8 @@ public class ModMenu implements ClientModInitializer {
 	public static final Map<String, Mod> ROOT_MODS = new HashMap<>();
 	public static final LinkedListMultimap<Mod, Mod> PARENT_MAP = LinkedListMultimap.create();
 
-	private static final List<Supplier<Map<String, ConfigScreenFactory<?>>>> dynamicScreenFactories = new ArrayList<>();
-	private static ImmutableMap<String, ConfigScreenFactory<?>> configScreenFactories = ImmutableMap.of();
+	private static final Map<String, ConfigScreenFactory<?>> configScreenFactories = new HashMap<>();
+	private static final List<Map<String, ConfigScreenFactory<?>>> delayedScreenFactoryProviders = new ArrayList<>();
 
 	private static int cachedDisplayedModCount = -1;
 
@@ -55,51 +54,63 @@ public class ModMenu implements ClientModInitializer {
 	}
 
 	public static Screen getConfigScreen( String modid, Screen menuScreen ) {
+		if ( !delayedScreenFactoryProviders.isEmpty() ) {
+			delayedScreenFactoryProviders.forEach( map -> map.forEach( configScreenFactories::putIfAbsent ) );
+			delayedScreenFactoryProviders.clear();
+		}
 		ConfigScreenFactory<?> factory = configScreenFactories.get( modid );
-		if ( factory != null )
+		if ( factory != null ) {
 			return factory.create( menuScreen );
-		for ( Supplier<Map<String, ConfigScreenFactory<?>>> factorySupplier : dynamicScreenFactories ) {
-			factory = factorySupplier.get().get( modid );
-			if ( factory != null )
-				return factory.create( menuScreen );
 		}
 		return null;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onInitializeClient() {
 		ModMenuConfigManager.initializeConfig();
-		Map<String, ConfigScreenFactory<?>> factories = new HashMap<>();
 		Map<String, String> additionalParents = new HashMap<>();
 		// find all entrypoints
-		List<EntrypointContainer<ModMenuApi>> entrypoints = FabricLoader.getInstance().getEntrypointContainers( "modmenu", ModMenuApi.class );
+		List<EntrypointContainer<ModMenuApiMarker>> entrypoints = FabricLoader.getInstance().getEntrypointContainers( "modmenu", ModMenuApiMarker.class );
 		// badges should be loaded first, as the other things depend on them
 		entrypoints.forEach( entrypoint -> {
-			try {
-				entrypoint.getEntrypoint().onSetupBadges();
-			} catch ( Throwable err ) {
-				LOGGER.error(
-					"Failed to setup badges from mod '{}': ",
-					entrypoint.getProvider().getMetadata().getId(),
-					err
-				);
+			if ( entrypoint.getEntrypoint() instanceof io.github.prospector.modmenu.api.ModMenuApi ) {
+				try {
+					( (io.github.prospector.modmenu.api.ModMenuApi) entrypoint.getEntrypoint() ).onSetupBadges();
+				} catch ( Throwable err ) {
+					LOGGER.error(
+						"Failed to setup badges from mod '{}': ",
+						entrypoint.getProvider().getMetadata().getId(),
+						err
+					);
+				}
 			}
 		} );
 		// load everything else
 		entrypoints.forEach( entrypoint -> {
-			ModMetadata meta = entrypoint.getProvider().getMetadata();
-			String modId = meta.getId();
+			ModMetadata metadata = entrypoint.getProvider().getMetadata();
+			String modId = metadata.getId();
 			try {
-				ModMenuApi api = entrypoint.getEntrypoint();
-				factories.put( modId, api.getModConfigScreenFactory() );
-				api.getAdditionalMods().forEach( mod -> MODS.put( mod.getId(), mod ) );
-				additionalParents.putAll( api.getAdditionalParents() );
-				dynamicScreenFactories.add( api::getProvidedConfigScreenFactories );
+				ModMenuApiMarker marker = entrypoint.getEntrypoint();
+				if ( marker instanceof com.terraformersmc.modmenu.api.ModMenuApi ) {
+					/* Current API */
+					ModMenuApi api = (com.terraformersmc.modmenu.api.ModMenuApi) marker;
+					configScreenFactories.put( modId, api.getModConfigScreenFactory() );
+					delayedScreenFactoryProviders.add( api.getProvidedConfigScreenFactories() );
+				} else if ( marker instanceof io.github.prospector.modmenu.api.ModMenuApi ) {
+					/* Legacy API */
+					io.github.prospector.modmenu.api.ModMenuApi api = (io.github.prospector.modmenu.api.ModMenuApi) entrypoint.getEntrypoint();
+					configScreenFactories.put( modId, screen -> api.getModConfigScreenFactory().create( screen ) );
+					api.getAdditionalMods().forEach( mod -> MODS.put( mod.getId(), mod ) );
+					additionalParents.putAll( api.getAdditionalParents() );
+					api.getProvidedConfigScreenFactories().forEach( (id, legacyFactory) -> configScreenFactories.put( id, legacyFactory::create ));
+				} else {
+					throw new RuntimeException( modId + " is providing an invalid ModMenuApi implementation" );
+				}
 			} catch ( Throwable e ) {
 				LOGGER.error( "Mod {} provides a broken implementation of ModMenuApi", modId, e );
 			}
 		} );
-		configScreenFactories = ImmutableMap.copyOf( factories );
 
 		// fill mods map
 		for ( ModContainer modContainer : FabricLoader.getInstance().getAllMods() ) {

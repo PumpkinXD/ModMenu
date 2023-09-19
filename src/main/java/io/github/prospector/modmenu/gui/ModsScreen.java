@@ -157,7 +157,7 @@ public class ModsScreen extends AbstractScreen {
 				final String modid = Objects.requireNonNull( selected ).getMod().getId();
 				if ( modHasConfigScreen.get( modid ) ) {
 					Screen configScreen = ModMenu.getConfigScreen( modid, this );
-					client.openScreen( configScreen );
+					client.setScreen( configScreen );
 				} else {
 					button.active = false;
 				}
@@ -251,7 +251,7 @@ public class ModsScreen extends AbstractScreen {
 
 			@Override
 			public void render( MinecraftClient minecraftClient, int mouseX, int mouseY ) {
-				GlStateManager.translatef( 0, 0, 1 );
+				GlStateManager.translate( 0, 0, 1 );
 				visible = filterOptionsShown;
 				String name = I18n.translate( "option." + ModMenu.MOD_ID + "." + ModMenuConfig.SORTING.getKey() );
 				String value = I18n.translate(
@@ -278,7 +278,7 @@ public class ModsScreen extends AbstractScreen {
 		) {
 			@Override
 			public void render( MinecraftClient minecraftClient, int mouseX, int mouseY ) {
-				GlStateManager.translatef( 0, 0, 1 );
+				GlStateManager.translate( 0, 0, 1 );
 				visible = filterOptionsShown;
 				String name = I18n.translate( "option." + ModMenu.MOD_ID + "." + ModMenuConfig.SHOW_LIBRARIES.getKey() );
 				String value = I18n.translate(
@@ -312,7 +312,7 @@ public class ModsScreen extends AbstractScreen {
 			150,
 			20,
 			ScreenTexts.DONE,
-			button -> client.openScreen( this.getPreviousScreen() )
+			button -> client.setScreen( this.getPreviousScreen() )
 		) );
 
 		init = true;
@@ -373,7 +373,7 @@ public class ModsScreen extends AbstractScreen {
 				DrawingUtil.drawRandomVersionBackground( mod, x, paneY, 32, 32 );
 			}
 			this.selected.bindIconTexture();
-			GlStateManager.color4f( 1.0F, 1.0F, 1.0F, 1.0F );
+			GlStateManager.color( 1.0F, 1.0F, 1.0F, 1.0F );
 			GlStateManager.enableBlend();
 			drawTexture( x, paneY, 0.0F, 0.0F, 32, 32, 32, 32 );
 			GlStateManager.disableBlend();
@@ -467,7 +467,7 @@ public class ModsScreen extends AbstractScreen {
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferBuilder = tessellator.getBuffer();
 		MinecraftClient.getInstance().getTextureManager().bindTexture( DrawableHelper.OPTIONS_BACKGROUND_TEXTURE );
-		GlStateManager.color4f( 0.0F, 0.0F, 0.0F, 1.0F );
+		GlStateManager.color( 0.0F, 0.0F, 0.0F, 1.0F );
 		bufferBuilder.begin( 7, VertexFormats.POSITION_TEXTURE_COLOR );
 		bufferBuilder.vertex( x1, y2, 0.0D ).texture( x1 / 32.0F, (float) ( y2 + scrollAmount ) / 32.0F ).color( 64, 64, 64, 255 ).next();
 		bufferBuilder.vertex( x2, y2, 0.0D ).texture( x2 / 32.0F, (float) ( y2 + scrollAmount ) / 32.0F ).color( 64, 64, 64, 255 ).next();
@@ -522,11 +522,11 @@ public class ModsScreen extends AbstractScreen {
 
 	public void openLink( Function<Mod, String> linkProducer ) {
 		final Mod mod = Objects.requireNonNull( selected ).getMod();
-		this.client.openScreen( new ConfirmChatLinkScreen(
+		this.client.setScreen( new ConfirmChatLinkScreen(
 			( bool, id ) -> {
 				if ( bool )
 					UrlUtil.getOperatingSystem().open( linkProducer.apply( mod ) );
-				this.client.openScreen( this );
+				this.client.setScreen( this );
 			},
 			linkProducer.apply( mod ),
 			999,

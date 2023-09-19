@@ -8,8 +8,7 @@ import io.github.prospector.modmenu.gui.widget.CyclingButtonWidget.TooltipFactor
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.options.GameOptions;
+import net.minecraft.client.option.GameOptions;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 
@@ -128,6 +127,7 @@ public class CyclingOption<T> extends Option {
 		return this;
 	}
 
+	@Override
 	public AbstractButtonWidget createButton( GameOptions options, int id, int x, int y, int width ) {
 		TooltipFactory<T> tooltipFactory = this.tooltips.apply( MinecraftClient.getInstance() );
 		return this.buttonBuilderFactory.get()

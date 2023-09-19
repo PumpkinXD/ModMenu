@@ -40,7 +40,7 @@ public class AbstractButtonWidget extends ButtonWidget {
 		if ( this.visible ) {
 			TextRenderer textRenderer = client.textRenderer;
 			client.getTextureManager().bindTexture( WIDGETS_LOCATION );
-			GlStateManager.color4f( 1.0F, 1.0F, 1.0F, 1.0F );
+			GlStateManager.color( 1.0F, 1.0F, 1.0F, 1.0F );
 
 			this.hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
 
@@ -50,7 +50,7 @@ public class AbstractButtonWidget extends ButtonWidget {
 			GlStateManager.blendFunc( 770, 771 );
 			this.drawTexture( this.x, this.y, 0, 46 + yOffset * 20, this.width / 2, this.height );
 			this.drawTexture( this.x + this.width / 2, this.y, 200 - this.width / 2, 46 + yOffset * 20, this.width / 2, this.height );
-			this.mouseDragged( client, mouseX, mouseY ); //renderBg is wrong name
+			this.mouseDragged( client, mouseX, mouseY );
 
 			int color = 16777215;
 			if ( !this.active )

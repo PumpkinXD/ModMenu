@@ -36,7 +36,7 @@ public class ModMenuTexturedButtonWidget extends AbstractButtonWidget {
 
 	@Override
 	public void render( MinecraftClient client, int mouseX, int mouseY ) {
-		GlStateManager.color4f( 1, 1, 1, 1f );
+		GlStateManager.color( 1, 1, 1, 1f );
 		client.getTextureManager().bindTexture( this.texture );
 		GlStateManager.disableDepthTest();
 		int adjustedV = this.v;

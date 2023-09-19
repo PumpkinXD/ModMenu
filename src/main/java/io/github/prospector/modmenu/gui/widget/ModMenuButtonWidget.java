@@ -7,6 +7,6 @@ import net.minecraft.text.Text;
 
 public class ModMenuButtonWidget extends AbstractButtonWidget {
 	public ModMenuButtonWidget( int id, int x, int y, int width, int height, Text text, Screen parent ) {
-		super( id, x, y, width, height, text, button -> MinecraftClient.getInstance().openScreen( new ModsScreen( parent ) ) );
+		super( id, x, y, width, height, text, button -> MinecraftClient.getInstance().setScreen( new ModsScreen( parent ) ) );
 	}
 }

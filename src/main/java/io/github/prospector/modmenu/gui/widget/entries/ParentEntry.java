@@ -57,7 +57,7 @@ public class ParentEntry extends ModListEntry {
 			int xOffset = list.getParent().showModChildren.contains( getMod().getId() ) ? iconSize : 0;
 			int yOffset = hoveringIcon ? iconSize : 0;
 			this.client.getTextureManager().bindTexture( PARENT_MOD_TEXTURE );
-			GlStateManager.color4f( 1.0F, 1.0F, 1.0F, 1.0F );
+			GlStateManager.color( 1.0F, 1.0F, 1.0F, 1.0F );
 			DrawableHelper.drawTexture(
 				x,
 				y,

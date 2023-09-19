@@ -36,7 +36,7 @@ public class ModMenuOptionsScreen extends AbstractScreen {
 			ScreenTexts.DONE,
 			( button ) -> {
 				ModMenuConfigManager.save();
-				this.client.openScreen( this.getPreviousScreen() );
+				this.client.setScreen( this.getPreviousScreen() );
 			}
 		) {
 		} );

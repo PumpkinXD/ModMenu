@@ -48,6 +48,7 @@ public class ModListWidget extends BetterEntryListWidget<ModListEntry> implement
 		this.setSelected( entry );
 	}
 
+	@Override
 	public void setSelected( ModListEntry entry ) {
 		super.setSelected( entry );
 		this.selectedModId = entry.getMod().getId();
